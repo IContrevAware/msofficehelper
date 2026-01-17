@@ -1,5 +1,6 @@
 # msofficehelper
   Helping people install MS Office. I DO NOT host any files of Microsoft so the USER must install all Microsoft files.
+  Not ALL Office Suites are included. Please check the code (myscript.bat) to see if your product is there.
 
   Instructions: Download the .bat in a folder (E:\officehelp).
   Now, go to: [https://www.microsoft.com/en-us/download/details.aspxid=49117].
