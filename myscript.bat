@@ -1,57 +1,62 @@
 @echo off
 setlocal EnableDelayedExpansion
-title Office Deployment Tool - User-Friendly Version
+title ODT - Helper
 
-rem ==============================================
-rem Automated Office Installer with menus
-rem ==============================================
 echo =========================================
-echo Microsoft Office Deployment Tool Installer
+echo Microsoft Office Deployment Tool Helper
+echo       V1.0.1 help plz
 echo =========================================
 echo.
 
-rem -----------------------------
-rem Check for setup.exe
-rem -----------------------------
+echo Read instructions on GitHub
+pause
+
 set SETUP_EXE=setup.exe
 set XMLFILE=office_config.xml
 
 if not exist "%SETUP_EXE%" (
-    echo setup.exe not found. Download the Office Deployment Tool:
-    echo https://www.microsoft.com/en-us/download/details.aspx?id=49117
+    echo setup.exe not found. Exiting.
     pause
     exit /b
 )
 
-rem -----------------------------
-rem Office product menu
-rem -----------------------------
 echo Select Office Product:
-echo 1. Microsoft 365 Apps for business (O365ProPlusRetail)
-echo 2. Microsoft Office 2021 Pro Plus Volume (ProPlus2021Volume)
-echo 3. Microsoft Office Standard 2021 Volume (Standard2021Volume)
+echo 1. Microsoft 365 Apps for Enterprise (Retail)
+echo 2. Microsoft 365 Apps for Business (Retail)
+echo 3. Microsoft 365 Enterprise No Teams (Retail)
+echo 4. Office LTSC / Volume 2024 Pro Plus
+echo 5. Office LTSC / Volume 2024 Standard
+echo 6. Office 2021 Pro Plus Volume
+echo 7. Office 2021 Standard Volume
+echo 8. Project Professional 2021 Volume
+echo 9. Project Standard 2021 Volume
+echo 10. Visio Professional 2021 Volume
+echo 11. Visio Standard 2021 Volume
 
 :product_select
-set /p PRODNUM=Enter number [1-3]: 
-if "%PRODNUM%"=="1" set PRODUCT=O365ProPlusRetail
-if "%PRODNUM%"=="2" set PRODUCT=ProPlus2021Volume
-if "%PRODNUM%"=="3" set PRODUCT=Standard2021Volume
+set /p PRODNUM=Enter number [1-11]: 
+
+if "%PRODNUM%"=="1" set PRODUCT=O365ProPlusRetail&set CHANNEL=Current
+if "%PRODNUM%"=="2" set PRODUCT=O365BusinessRetail&set CHANNEL=Current
+if "%PRODNUM%"=="3" set PRODUCT=O365ProPlusEEANoTeamsRetail&set CHANNEL=Current
+if "%PRODNUM%"=="4" set PRODUCT=ProPlus2024Volume&set CHANNEL=PerpetualVL2024
+if "%PRODNUM%"=="5" set PRODUCT=Standard2024Volume&set CHANNEL=PerpetualVL2024
+if "%PRODNUM%"=="6" set PRODUCT=ProPlus2021Volume&set CHANNEL=PerpetualVL2021
+if "%PRODNUM%"=="7" set PRODUCT=Standard2021Volume&set CHANNEL=PerpetualVL2021
+if "%PRODNUM%"=="8" set PRODUCT=ProjectPro2021Volume&set CHANNEL=PerpetualVL2021
+if "%PRODNUM%"=="9" set PRODUCT=ProjectStd2021Volume&set CHANNEL=PerpetualVL2021
+if "%PRODNUM%"=="10" set PRODUCT=VisioPro2021Volume&set CHANNEL=PerpetualVL2021
+if "%PRODNUM%"=="11" set PRODUCT=VisioStd2021Volume&set CHANNEL=PerpetualVL2021
+
 if not defined PRODUCT (
     echo Invalid selection, try again.
     goto product_select
 )
 
-rem -----------------------------
-rem Language
-rem -----------------------------
 set /p LANGUAGE=Enter language code (e.g., en-gb, en-us): 
 
-rem -----------------------------
-rem Apps menu
-rem -----------------------------
 echo.
-echo Select apps you want to INSTALL:
-echo Type numbers separated by spaces. Example: 1 2 3
+echo Select apps you want to INSTALL (by number, space-separated):
 echo 1. Word
 echo 2. Excel
 echo 3. PowerPoint
@@ -60,10 +65,10 @@ echo 5. OneNote
 echo 6. Access
 echo 7. Publisher
 echo 8. Teams
+echo e.g : 1 3 6 (1 3 6 gets word, ppt and access)
 
 set /p APPNUMS=Enter selection: 
 
-rem Map numbers to apps
 set ALL_APPS=Word Excel PowerPoint Outlook OneNote Access Publisher Groove Lync Teams
 set INCLUDED_APPS=
 
@@ -78,20 +83,14 @@ for %%A in (%APPNUMS%) do (
     if %%A==8 set INCLUDED_APPS=!INCLUDED_APPS! Teams
 )
 
-rem -----------------------------
-rem Offline/Online
-rem -----------------------------
 echo.
 set /p INSTALLTYPE=Offline or Online install? (OFFLINE/ONLINE): 
 
-rem -----------------------------
-rem Generate XML
-rem -----------------------------
 echo Generating configuration XML...
 
 (
 echo ^<Configuration^>
-echo   ^<Add OfficeClientEdition="64" Channel="Current"^>
+echo   ^<Add OfficeClientEdition="64" Channel="%CHANNEL%"^>
 echo     ^<Product ID="%PRODUCT%"^>
 echo       ^<Language ID="%LANGUAGE%" /^>
 
@@ -116,9 +115,6 @@ echo.
 echo Configuration file created: %XMLFILE%
 echo.
 
-rem -----------------------------
-rem Install logic
-rem -----------------------------
 if /I "%INSTALLTYPE%"=="OFFLINE" (
     echo Downloading Office files for offline install...
     "%SETUP_EXE%" /download %XMLFILE%
